@@ -1,0 +1,75 @@
+2016-04-01  James Monk  <jmonk@cern.ch>
+  * set_crash_on_problem now set true
+  * tagging for release as 1.0.0
+
+2014-11-26  James Monk  <jmonk@cern.ch>
+  * Fix multiple weights and CCKW-L cross section
+  * Update A2-MSTW2008LO and AU2-CT10 for new Py8.2 PDF syntax
+  * Add lhapdfdummy to linker only for Pythia version less than 8.2
+  * Option to slim the event record (-s) is now off by default.  The option -s on the commandline now turns on the full event slimming (removes everything except final state particles)
+
+2014-09-18  James Monk  <jmonk@cern.ch>
+  * Update build and params for Pythia 8.200
+
+2014-02-26  James Monk  <jmonk@cern.ch>
+  * change default beam energy to 8000 GeV
+
+2014-02-03  James Monk  <jmonk@cern.ch>
+  * improve header directory structure to include/Sacrifice include/tclap etc.
+  * Download tarball of MCUtils headers and install in include if not already present there.
+  * Use the downloaded MCUtils unless otherwise specified
+  #increase version to 0.9.9, make tarball
+
+2013-11-25  James Monk  <jmonk@cern.ch>
+  * Compatibility with Pythia 8.180
+
+2013-07-29  James Monk  <jmonk@cern.ch>
+  * PTRel_boostVetoedShower.cxx: another vetoed shower, this time implemented with a
+    boost that evolves during the evtn due to recoil.  Should be identical to main31
+
+2013-07-14  James Monk  <jmonk@cern.ch>
+  * HepMC no longer optional.  Doesn't really make sense, since HepMC output is the whole point
+  * Add option to produced gzip compressed output.  
+    Option will only be present if Pythia itself was compiled with gzip support.
+
+2013-07-10  James Monk  <jmonk@cern.ch>
+  * Optional support for MCUtils to provide reduced HepMC size through filtering
+
+2013-07-08  James Monk  <jmonk@cern.ch>
+  * Suppress and Enhance MPI Userhooks.  Veto events with MPI above and below a threshold
+
+2013-07-01  James Monk  <jmonk@cern.ch>
+  * update m4 scripts for slc6 gcc 46
+  * setupPythia.sh script adds LHAPATH
+
+2013-06-19  James Monk  <jmonk@cern.ch>
+  *  User hook for vetoed shower using relative pT and reduced scale, a la main31
+
+2013-02-13  James Monk	<jmonk@cern.ch>
+  * Update build system to support Pythia with gzip 
+
+2013-01-28  James Monk <jmonk@cern.ch>
+  * Selection of UserHooks for vetoed shower with PoWHEG
+      WZVetoedShower.cxx vetoes emissions relative to the beam
+      QCDVetoedShower.cxx compares each emission to each PoWHEG leg
+      PoWHEGVetoedShower vetoes relative to the beam, but determines a new
+      definition of the veto scale
+  * The above author suggested veto schemes need testing and validating!
+  * Improved UserHook library loading (local directory, SACRIFICE_LIB_PATH, install lib dir)
+
+2013-01-24  James Monk	<jmonk@cern.ch>
+  * Allow user configuration of the lcg tag for troublesome setups
+	
+2012-12-13  James Monk  <jmonk@cern.ch>
+  * Add support for loading user hooks on the cmd line
+
+2012-05-21  James Monk  <jmonk@cern.ch>
+  * Initial check-in to AGILe svn repository
+  * Supports Pythia 8 with HepMC, LHAPDF, PHOTOS++
+  * ./configure ^should^ discover all libraries from genser, if available
+  * Photos support optional (--enable-photos to turn it on)
+  * ~Replicates the ATLAS setup, including PHOTOS++ wrangling 
+  * Setup script installed in share: source share/setupPythia8.sh
+
+2012-02-22  James Monk  <jmonk@cern.ch>
+  * Initial version of Pythia 8 main program + build system

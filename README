@@ -1,0 +1,25 @@
+Main program for Pythia 8: You should make a sacrifice before you consult the Pythia.
+
+Optionally builds against HepMC, LHAPDF (default = yes) and PHOTOS++ (default = no).  Requires the Pythia 8 library, of course.
+
+Help on building can be obtained by
+
+  ./configure --help
+
+If on a machine with AFS access to Genser then the necessary libraries ^should^ be found with no further tweaking.
+
+Usually
+
+  ./configure <--enable-photos> <--prefix=/path/to/install> <other options>
+  make
+  make install
+  
+will do the trick.  The executable is called run-pythia.  A setup script, setupPythia.sh, will be installed in the share directory.
+
+Help is available with
+
+  source setupPythia.sh
+  ./run-pythia --help
+
+
+

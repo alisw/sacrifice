@@ -1,0 +1,7 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+
+export PATH="$exec_prefix/bin:$PATH"
+export @LIBPATHVARNAME@="@PYTHIA_LIBDIR@:@PHOTOS_LIBDIR@:@LHAPDF_LIBDIR@:@HEPMC_LIBDIR@:@BOOST_LIBDIR@:$@LIBPATHVARNAME@"
+export LHAPATH="@LHAPDF_LHAPATH@"
+#export PYTHIA8DATA="@PYTHIA_DATA@"
