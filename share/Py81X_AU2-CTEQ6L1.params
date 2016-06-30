@@ -1,0 +1,19 @@
+
+6:m0 = 172.5
+23:m0 = 91.1876
+24:m0 = 80.399
+
+#CTau lifetime cut
+ParticleDecays:limitTau0 = on
+ParticleDecays:tau0Max = 10.0
+
+# Tune A2 settings
+Tune:pp = 5
+PDF:useLHAPDF = on
+PDF:LHAPDFset = cteq6ll.LHpdf
+MultipartonInteractions:bProfile = 4
+MultipartonInteractions:a1 = 0.00
+MultipartonInteractions:pT0Ref = 2.13
+MultipartonInteractions:ecmPow = 0.21
+BeamRemnants:reconnectRange = 2.21
+SpaceShower:rapidityOrder=off

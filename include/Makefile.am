@@ -1,0 +1,4 @@
+SUBDIRS = Sacrifice tclap MCUtils
+
+
+

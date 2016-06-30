@@ -1,0 +1,24 @@
+
+6:m0 = 172.5
+23:m0 = 91.1876
+24:m0 = 80.399
+
+#CTau lifetime cut
+ParticleDecays:limitTau0 = on
+ParticleDecays:tau0Max = 10.0
+
+# Tune A14 settings
+Tune:ee = 7
+Tune:pp = 14
+PDF:pSet= LHAPDF6:NNPDF23_lo_as_0130_qed
+SpaceShower:rapidityOrder = on
+SigmaProcess:alphaSvalue = 0.140
+SpaceShower:pT0Ref = 1.56
+SpaceShower:pTmaxFudge = 0.91
+SpaceShower:pTdampFudge = 1.05
+SpaceShower:alphaSvalue = 0.127
+TimeShower:alphaSvalue = 0.127
+BeamRemnants:primordialKThard = 1.88
+MultipartonInteractions:pT0Ref = 2.09
+MultipartonInteractions:alphaSvalue = 0.126
+ColourReconnection:range = 1.71
