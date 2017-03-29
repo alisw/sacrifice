@@ -96,7 +96,7 @@ int main(int argc, char **argv){
   HepMCConverter pythiaToHepMC;
 
   pythiaToHepMC.set_store_pdf(true);
-  pythiaToHepMC.set_crash_on_problem(true);
+  // pythiaToHepMC.set_crash_on_problem(true);
   
   if(photosHandler.isEnabled()){
     photosHandler.initialise();
