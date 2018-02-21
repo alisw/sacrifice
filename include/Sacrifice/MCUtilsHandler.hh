@@ -3,7 +3,7 @@
 
 #include "tclap/CmdLine.h"
 
-#include "boost/function.hpp"
+#include <functional>
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@ namespace Sacrifice{
   using std::vector;
   using std::map;
   
-  typedef boost::function<bool(const HepMC::GenParticle*)> Classifier;
+  typedef std::function<bool(const HepMC::GenParticle*)> Classifier;
   
   class MCUtilsHandler{
     
@@ -47,7 +47,7 @@ namespace Sacrifice{
       
       void addParticle(int pid, const vector<int> &statuses){
 
-	m_pids[pid].insert(m_pids[pid].end(), statuses.begin(), statuses.end());
+        m_pids[pid].insert(m_pids[pid].end(), statuses.begin(), statuses.end());
         return;
       }
       

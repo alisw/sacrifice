@@ -1,13 +1,9 @@
 lib_LTLIBRARIES             = SacrificePlugin.la
 
-SacrificePlugin_la_SOURCES  = PoWHEGVetoedShower.cxx        \
-                              PTRelVetoedShower.cxx         \
-                              PTRel_boostVetoedShower.cxx   \
-                              QCDVetoedShower.cxx           \
-                              EnhanceMPI.cxx                \
-                              SuppressMPI.cxx               \
-                              WZVetoedShower.cxx            
-#                              main31.cxx      
+SacrificePlugin_la_SOURCES  = main31.cxx                  \
+                              JetMatchingMadGraphHook.cxx \
+                              EnhanceMPI.cxx              \
+                              SuppressMPI.cxx
 
 nobase_pkginclude_HEADERS   = UserHookUtils.hh
 

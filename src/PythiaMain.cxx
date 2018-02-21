@@ -27,13 +27,10 @@
 #include "HepMC/GenEvent.h"
 #include "HepMC/Units.h"
 
-#include "boost/lexical_cast.hpp"
-
 #include <string>
 #include <stdexcept>
 
 using namespace std;
-
 
 int main(int argc, char **argv){
 
@@ -52,7 +49,7 @@ int main(int argc, char **argv){
 
   //Do this first so we always get the Pythia banner and version information
   Pythia8::Pythia pythia(path);
-  std::string pythiaVersion = boost::lexical_cast<std::string>(pythia.settings.parm("Pythia:versionNumber") + 0.00000000001);
+  std::string pythiaVersion = to_string(pythia.settings.parm("Pythia:versionNumber") + 0.00000000001);
   pythiaVersion.erase(5);
   std::string message = "Main program for steering Pythia " + pythiaVersion + ".  Bug reports to James Monk <jmonk@cern.ch>";
 
@@ -64,9 +61,9 @@ int main(int argc, char **argv){
 
   TCLAP::ValueArg<int> seedArg("r", "random-seed", "Random seed", false, -1, "int");
   TCLAP::MultiArg<std::string> inputArg("i", "input", "Input command file", false, "string");
-  TCLAP::ValueArg<std::string> beam1Arg("f", "beam1", "Forward-going beam type (default PROTON)", false, "PROTON", "string");
-  TCLAP::ValueArg<std::string> beam2Arg("b", "beam2", "Backward-going beam type (default PROTON)", false, "PROTON", "string");
-  TCLAP::ValueArg<double> energyArg("e", "collision-energy", "Collision energy in GeV (default 7000 GeV)", false, 8000., "double");
+  TCLAP::ValueArg<std::string> beam1Arg("f", "beam1", "Forward-going beam type", false, "", "string");
+  TCLAP::ValueArg<std::string> beam2Arg("b", "beam2", "Backward-going beam type", false, "", "string");
+  TCLAP::ValueArg<double> energyArg("e", "collision-energy", "Collision energy in GeV (default 13000 GeV)", false, 13000., "double");
   TCLAP::ValueArg<int> nEventsArg("n", "nEvents", "Number of events to generate (default 100)", false, 100, "int");
   TCLAP::MultiArg<std::string> paramsArgs("c", "command", "Commands to be read directly in to Pythia. Over-rides command file.", false, "string");
   TCLAP::ValueArg<std::string> dataArg("d", "particle-data", "XML file of particle data.  Over-rides default in $PYTHIA8DATA.", false, "", "string");
@@ -96,7 +93,7 @@ int main(int argc, char **argv){
   HepMCConverter pythiaToHepMC;
 
   pythiaToHepMC.set_store_pdf(true);
-  pythiaToHepMC.set_crash_on_problem(true);
+//  pythiaToHepMC.set_crash_on_problem(true);
   
   if(photosHandler.isEnabled()){
     photosHandler.initialise();
@@ -122,7 +119,7 @@ int main(int argc, char **argv){
   }
 
   if(seedArg.getValue() > 0){
-    std::string seedString = "Random:seed=" + boost::lexical_cast<string>(seedArg.getValue());
+    std::string seedString = "Random:seed=" + to_string(seedArg.getValue());
     bool understood = pythia.readString("Random:setSeed=on");
     understood = understood && pythia.readString(seedString);
     if(! understood) throw std::runtime_error("Your version of Pythia does not understand the random seed commands!");
@@ -132,9 +129,6 @@ int main(int argc, char **argv){
     bool understood = pythia.readString("TimeShower:QEDshowerByL = off");
     if(! understood) throw std::runtime_error("Your version of Pythia does not understand the command to turn off QED FSR!");
   }
-
-  Sacrifice::BeamParticle beam1(beam1Arg.getValue());
-  Sacrifice::BeamParticle beam2(beam2Arg.getValue());
 
   if(hooksArg.getValue() != ""){
     Sacrifice::UserHooksFactory::loadLibrary(libArg.getValue());
@@ -149,18 +143,29 @@ int main(int argc, char **argv){
 
   bool isInitialised = true;
   bool doLHEF = false;
-
+  
   if(lhefArg.getValue() != ""){
     isInitialised = isInitialised && pythia.readString("Beams:frameType = 4");
     isInitialised = isInitialised && pythia.readString("Beams:LHEF = " + lhefArg.getValue());
     doLHEF = true;
   }else{
     isInitialised = isInitialised && pythia.readString("Beams:frameType = 1");
-    isInitialised = isInitialised && pythia.readString("Beams:idA = " + boost::lexical_cast<string>(beam1.asID()));
-    isInitialised = isInitialised && pythia.readString("Beams:idB = " + boost::lexical_cast<string>(beam2.asID()));
-    isInitialised = isInitialised && pythia.readString("Beams:eCM = " + boost::lexical_cast<string>(energyArg.getValue()));
+    
+    if(beam1Arg.getValue() != ""){
+      Sacrifice::BeamParticle beam1(beam1Arg.getValue());
+      isInitialised = isInitialised && pythia.readString("Beams:idA = " + to_string(beam1.asID()));
+    }
+    
+    if(beam2Arg.getValue() != ""){
+      Sacrifice::BeamParticle beam2(beam2Arg.getValue());
+      isInitialised = isInitialised && pythia.readString("Beams:idB = " + to_string(beam2.asID()));
+    }
+    
+    isInitialised = isInitialised && pythia.readString("Beams:eCM = " + to_string(energyArg.getValue()));
   }
 
+  pythia.readString("Next:numberShowEvent = 0");
+  
   isInitialised = isInitialised && pythia.init();
 
   if(!isInitialised) throw std::runtime_error("Could not initialise Pythia");
@@ -187,6 +192,21 @@ int main(int argc, char **argv){
       if(eventNumber == 0) --eventNumber;
     }
 
+    double phaseSpaceWeight = pythia.info.weight();
+    double mergingWeight    = pythia.info.mergingWeight();
+    double eventWeight = phaseSpaceWeight*mergingWeight;
+    
+    nAccepted += 1.;
+    
+    if(fabs(eventWeight) < 1.e-18 ||
+       pythia.event.size() < 2){
+      
+      if(eventNumber == 0) --eventNumber;
+      continue;
+    }else{
+      nMerged += eventWeight;
+    }
+    
 #ifdef HEPMC_HAS_UNITS ///
     HepMC::GenEvent *hepMCEvent = new HepMC::GenEvent(HepMC::Units::GEV, HepMC::Units::MM);
 #else
@@ -194,27 +214,12 @@ int main(int argc, char **argv){
 #endif /// HEPMC_HAS_UNITS
 
     pythiaToHepMC.fill_next_event(pythia, hepMCEvent);
-
+    
     if(photosHandler.isEnabled()){
       photosHandler.process(hepMCEvent);
     }
 
     if(mcutils.isAvailable()) mcutils.filter(hepMCEvent);
-
-    double phaseSpaceWeight = pythia.info.weight();
-    double mergingWeight    = pythia.info.mergingWeight();
-    double eventWeight = phaseSpaceWeight*mergingWeight;
-
-    nAccepted += 1.;
-
-    if(fabs(eventWeight) < 1.e-18 ||
-       pythia.event.size() < 2){
-
-      if(eventNumber == 0) --eventNumber;
-      continue;
-    }else{
-      nMerged += eventWeight;
-    }
 
     hepMCEvent->weights().clear();
 

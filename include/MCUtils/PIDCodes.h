@@ -1,3 +1,11 @@
+// -*- C++ -*-
+//
+// This file is part of MCUtils -- https://bitbucket.org/andybuckley/mcutils
+// Copyright (C) 2013-2017 Andy Buckley <andy.buckley@cern.ch>
+//
+// Embedding of MCUtils code in other projects is permitted provided this
+// notice is retained and the MCUtils namespace and include path are changed.
+//
 #pragma once
 
 /// @file Convenience names for PDG ID codes, for cleaner code
@@ -139,6 +147,13 @@ namespace MCUtils {
     static const int NEUTRALINO1 = 1000022;
     static const int GRAVITINO = 1000039;
     static const int GLUINO = 1000021;
+    static const int BPRIME = 7;
+    static const int TPRIME = 8;
+    static const int LPRIME = 17;
+    static const int NUPRIME = 18;
+    // static const int DARKMATTERSCALAR = 1000051;
+    // static const int DARKMATTERFERMION = 1000052;
+    // static const int DARKMATTERVECTOR = 1000053;
     /// @todo Add axion, black hole remnant, etc. on demand
     //@}
 

@@ -87,17 +87,6 @@ if test x$found_pythia = xyes ; then
     fi
     PYTHIA_DATA="$pythia_data"
     
-    # test for z lib dependency
-    
-    have_zlib=no
-    
-    zlib=`nm -P $pythia_lib/libpythia8.$LIB_SUFFIX | grep -i zlib | head -n 1`
-    
-    if test "x$zlib" != "x" ; then
-      have_zlib=yes
-      PYTHIA_LDFLAGS="$PYTHIA_LDFLAGS $BOOST_LDFLAGS -lboost_iostreams"
-    fi
-    
     if test x$enable_HepMC = xyes && test x$hepmclib != xno ; then
       if test -f $pythia_lib/lib$hepmclib.$LIB_SUFFIX ; then
         PYTHIA_LDFLAGS="$PYTHIA_LDFLAGS -l$hepmclib"
@@ -131,7 +120,6 @@ if test x$found_pythia = xyes ; then
   AC_SUBST([PYTHIA_CPPFLAGS])
   AC_SUBST([PYTHIA_DATA])
   AC_SUBST([PYTHIA_LIBDIR])
-  AM_CONDITIONAL(ENABLE_GZIP, [test x$have_zlib = xyes])
   AC_MSG_NOTICE([Found Pythia 8 libraries and headers])
   AC_MSG_NOTICE([PYTHIA_LDFLAGS = $PYTHIA_LDFLAGS])
   AC_MSG_NOTICE([PYTHIA_CPPFLAGS = $PYTHIA_CPPFLAGS])

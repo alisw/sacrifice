@@ -1,4 +1,4 @@
-SUBDIRS = Sacrifice tclap MCUtils
+SUBDIRS = Sacrifice tclap MCUtils HEPUtils
 
 
 

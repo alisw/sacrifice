@@ -1,228 +1,291 @@
+// -*- C++ -*-
+//
+// This file is part of MCUtils -- https://bitbucket.org/andybuckley/mcutils
+// Copyright (C) 2013-2016 Andy Buckley <andy.buckley@cern.ch>
+//
+// Embedding of MCUtils code in other projects is permitted provided this
+// notice is retained and the MCUtils namespace and include path are changed.
+//
 #pragma once
+
+#if __cplusplus <= 199711L
+#error "This library needs at least a C++11 compliant compiler: are you using -std=c++11?"
+#endif
 
 /// @file Functions for filtering and classifying HepMC record contents
 /// @author Andy Buckley <andy.buckley@cern.ch>
 /// @author Nataliia Kondrashova <Nataliia.Kondrashova@cern.ch>
 
 #include "HepMC/GenEvent.h"
-#include "boost/function.hpp" //< Replace with std::function when possible
 #include <vector>
-
-// Provide convenience foreach loop -- particularly nice for HepMC walking combined with the functions below
-#include "boost/foreach.hpp"
-#ifndef foreach
-#define foreach BOOST_FOREACH
-#endif
+#include <functional>
 
 #include "MCUtils/HepMCEventUtils.h"
 #include "MCUtils/PIDUtils.h"
-#include "MCUtils/Vectors.h"
+
+// Macro to map HepMC functions to PID:: functions of the same name
+#define HEPMC_TO_PID_FN(fname) fname (const HepMC::GenParticle* p) { return PID:: fname (p->pdg_id()); }
 
 namespace MCUtils {
+
+  using HEPUtils::in_range;
+
+  // Fwd declaration
+  bool _isDecayedHFHadronOrTau(const HepMC::GenParticle* p);
 
 
   /// @name GenParticle classifier functions
   //@{
 
   /// Convenient type name for a generic classifier function / function object
-  typedef boost::function<bool(const HepMC::GenParticle*)> PClassifier;
-
+  typedef std::function<bool(const HepMC::GenParticle*)> PClassifier;
 
 
   /// Is this particle species charged?
-  inline bool isCharged(const HepMC::GenParticle* p) {
-    return PID::isCharged(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isCharged)
 
   /// Is this particle species neutral?
-  inline bool isNeutral(const HepMC::GenParticle* p) {
-    return PID::isNeutral(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isNeutral)
+
 
   /// Is this a neutrino?
-  inline bool isNeutrino(const HepMC::GenParticle* p) {
-    return PID::isNeutrino(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isNeutrino)
 
   /// Determine if the PID is that of a charged lepton
-  inline bool isChLepton(const HepMC::GenParticle* p) {
-    return PID::isChLepton(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isChLepton)
 
   /// Determine if the PID is that of a photon
-  inline bool isPhoton(const HepMC::GenParticle* p) {
-    return PID::isPhoton(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isPhoton)
 
   /// Determine if the PID is that of an electron or positron
-  inline bool isElectron(const HepMC::GenParticle* p) {
-    return PID::isElectron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isElectron)
 
   /// Determine if the PID is that of an muon or antimuon
-  inline bool isMuon(const HepMC::GenParticle* p) {
-      return PID::isMuon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isMuon)
 
   /// Determine if the PID is that of an tau or antitau
-  inline bool isTau(const HepMC::GenParticle* p) {
-    return PID::isTau(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isTau)
 
   /// Determine if the PID is that of a hadron
-  inline bool isHadron(const HepMC::GenParticle* p) {
-    return PID::isHadron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isHadron)
 
   /// Determine if the PID is that of a meson
-  inline bool isMeson(const HepMC::GenParticle* p) {
-    return PID::isMeson(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isMeson)
 
   /// Determine if the PID is that of a baryon
-  inline bool isBaryon(const HepMC::GenParticle* p) {
-    return PID::isBaryon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isBaryon)
 
   /// Determine if the PID is that of a quark
-  inline bool isQuark(const HepMC::GenParticle* p) {
-    return PID::isQuark(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isQuark)
+
+  /// Determine if the PID is that of a gluon
+  inline bool HEPMC_TO_PID_FN(isGluon)
 
   /// Determine if the PID is that of a parton (quark or gluon)
-  inline bool isParton(const HepMC::GenParticle* p) {
-    return PID::isParton(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isParton)
+
 
 
   /// Determine if the PID is that of a W+
-  inline bool isWplus(const HepMC::GenParticle* p) {
-    return PID::isWplus(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isWplus)
 
   /// Determine if the PID is that of a W-
-  inline bool isWminus(const HepMC::GenParticle* p) {
-    return PID::isWminus(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isWminus)
 
   /// Determine if the PID is that of a W+-
-  inline bool isW(const HepMC::GenParticle* p) {
-    return PID::isW(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isW)
 
   /// Determine if the PID is that of a Z0
-  inline bool isZ(const HepMC::GenParticle* p) {
-    return PID::isZ(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isZ)
 
   /// Determine if the PID is that of an SM/lightest SUSY Higgs
-  inline bool isHiggs(const HepMC::GenParticle* p) {
-    return PID::isHiggs(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isHiggs)
 
   /// Determine if the PID is that of a t/tbar
-  inline bool isTop(const HepMC::GenParticle* p) {
-    return PID::isTop(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isTop)
 
+
+  /// Determine if the particle is a heavy flavour hadron or parton
+  inline bool HEPMC_TO_PID_FN(isHeavyFlavour)
+
+  /// Determine if the PID is that of a heavy parton (c,b,t)
+  inline bool HEPMC_TO_PID_FN(isHeavyParton)
+
+  /// Determine if the PID is that of a light parton (u,d,s)
+  inline bool HEPMC_TO_PID_FN(isLightParton)
+
+
+  /// Determine if the PID is that of a heavy flavour (b or c) meson
+  inline bool HEPMC_TO_PID_FN(isHeavyMeson)
+
+  /// Determine if the PID is that of a heavy flavour (b or c) baryon
+  inline bool HEPMC_TO_PID_FN(isHeavyBaryon)
+
+  /// Determine if the PID is that of a heavy flavour (b or c) hadron
+  inline bool HEPMC_TO_PID_FN(isHeavyHadron)
 
 
   /// Determine if the PID is that of a light flavour (not b or c) meson
-  inline bool isLightMeson(const HepMC::GenParticle* p) {
-    return PID::isLightMeson(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isLightMeson)
 
   /// Determine if the PID is that of a light flavour (not b or c) baryon
-  inline bool isLightBaryon(const HepMC::GenParticle* p) {
-    return PID::isLightBaryon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isLightBaryon)
 
   /// Determine if the PID is that of a light flavour (not b or c) hadron
-  inline bool isLightHadron(const HepMC::GenParticle* p) {
-    return PID::isLightHadron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isLightHadron)
 
-  /// Determine if the PID is that of a heavy flavour (b or c) meson
-  inline bool isHeavyMeson(const HepMC::GenParticle* p) {
-    return PID::isHeavyMeson(p->pdg_id());
-  }
-
-  /// Determine if the PID is that of a heavy flavour (b or c) baryon
-  inline bool isHeavyBaryon(const HepMC::GenParticle* p) {
-    return PID::isHeavyBaryon(p->pdg_id());
-  }
-
-  /// Determine if the PID is that of a heavy flavour (b or c) hadron
-  inline bool isHeavyHadron(const HepMC::GenParticle* p) {
-    return PID::isHeavyHadron(p->pdg_id());
-  }
 
   /// Determine if the PID is that of a b-meson.
-  inline bool isBottomMeson(const HepMC::GenParticle* p) {
-    return PID::isBottomMeson(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isBottomMeson)
 
   /// Determine if the PID is that of a b-baryon.
-  inline bool isBottomBaryon(const HepMC::GenParticle* p) {
-    return PID::isBottomBaryon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isBottomBaryon)
 
   /// Determine if the PID is that of a b-hadron.
-  inline bool isBottomHadron(const HepMC::GenParticle* p) {
-    return PID::isBottomHadron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isBottomHadron)
+
 
   /// @brief Determine if the PID is that of a c-meson.
   ///
   /// Specifically, the _heaviest_ quark is a c: a B_c is a b-meson and NOT a c-meson.
   /// Charmonia (closed charm) are counted as c-mesons here.
-  inline bool isCharmMeson(const HepMC::GenParticle* p) {
-    return PID::isCharmMeson(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isCharmMeson)
 
   /// @brief Determine if the PID is that of a c-baryon.
   ///
   /// Specifically, the _heaviest_ quark is a c: a baryon containing a b & c
   /// is a b-baryon and NOT a c-baryon. To test for the simpler case, just use
   /// a combination of hasCharm() and isBaryon().
-  inline bool isCharmBaryon(const HepMC::GenParticle* p) {
-    return PID::isCharmBaryon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isCharmBaryon)
 
   /// Determine if the PID is that of a c-hadron.
-  inline bool isCharmHadron(const HepMC::GenParticle* p) {
-    return PID::isCharmHadron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isCharmHadron)
+
 
   /// Determine if the PID is that of a strange meson
-  inline bool isStrangeMeson(const HepMC::GenParticle* p) {
-    return PID::isStrangeMeson(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isStrangeMeson)
 
   /// Determine if the PID is that of a strange baryon
-  inline bool isStrangeBaryon(const HepMC::GenParticle* p) {
-    return PID::isStrangeBaryon(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isStrangeBaryon)
 
   /// Determine if the PID is that of a strange hadron
-  inline bool isStrangeHadron(const HepMC::GenParticle* p) {
-    return PID::isStrangeHadron(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isStrangeHadron)
+
+
+
+  /// Is this a pomeron, odderon, or generic reggeon?
+  inline bool HEPMC_TO_PID_FN(isReggeon)
+
+  /// Determine if the PID is that of a diquark (used in hadronization models)
+  inline bool HEPMC_TO_PID_FN(isDiquark)
+
+  /// Determine if the PID is that of a pentaquark (hypothetical hadron)
+  inline bool HEPMC_TO_PID_FN(isPentaquark)
+
+  /// Is this a fundamental SUSY particle?
+  inline bool HEPMC_TO_PID_FN(isSUSY)
+
+  /// Is this an R-hadron?
+  inline bool HEPMC_TO_PID_FN(isRhadron)
+
+  /// Is this a technicolor particle?
+  inline bool HEPMC_TO_PID_FN(isTechnicolor)
+
+  /// Is this an excited (composite) quark or lepton?
+  inline bool HEPMC_TO_PID_FN(isExcited)
+
+  /// Is this a Kaluza-Klein excitation?
+  inline bool HEPMC_TO_PID_FN(isKK)
+
+  /// Is this a graviton?
+  inline bool HEPMC_TO_PID_FN(isGraviton)
+
+  /// Is this a BSM particle (including graviton)?
+  inline bool HEPMC_TO_PID_FN(isBSM)
+
 
 
   /// Determine if the PID is in the generator-specific range
-  inline bool isGenSpecific(const HepMC::GenParticle* p) {
-    return PID::isGenSpecific(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isGenSpecific)
 
   /// Determine if the PID is that of an EW scale resonance
-  inline bool isResonance(const HepMC::GenParticle* p) {
-    return PID::isResonance(p->pdg_id());
-  }
+  inline bool HEPMC_TO_PID_FN(isResonance)
 
   /// Check the PID for usability in transport codes like Geant4
-  inline bool isTransportable(const HepMC::GenParticle* p) {
-    return PID::isTransportable(p->pdg_id());
+  inline bool HEPMC_TO_PID_FN(isTransportable)
+
+
+
+  /// Does this particle contain an up quark?
+  inline bool HEPMC_TO_PID_FN(hasUp)
+
+  /// Does this particle contain a down quark?
+  inline bool HEPMC_TO_PID_FN(hasDown)
+
+  /// Does this particle contain a strange quark?
+  inline bool HEPMC_TO_PID_FN(hasStrange)
+
+  /// Does this particle contain a charm quark?
+  inline bool HEPMC_TO_PID_FN(hasCharm)
+
+  /// Does this particle contain a bottom quark?
+  inline bool HEPMC_TO_PID_FN(hasBottom)
+
+  /// Does this particle contain a top quark?
+  inline bool HEPMC_TO_PID_FN(hasTop)
+
+
+  /// Does this particle interact strongly?
+  inline bool HEPMC_TO_PID_FN(isStrongInteracting)
+
+  /// Does this particle interact electromagnetically?
+  inline bool HEPMC_TO_PID_FN(isEMInteracting)
+
+  /// Does this particle interact weakly?
+  inline bool HEPMC_TO_PID_FN(isWeakInteracting)
+
+
+  /// jSpin returns 2J+1, where J is the total spin
+  inline int HEPMC_TO_PID_FN(jSpin)
+
+  /// sSpin returns 2S+1, where S is the spin
+  inline int HEPMC_TO_PID_FN(sSpin)
+
+  /// lSpin returns 2L+1, where L is the orbital angular momentum
+  inline int HEPMC_TO_PID_FN(lSpin)
+
+
+  /// Return 3 times the charge (3 x quark charge is an int)
+  inline int HEPMC_TO_PID_FN(threeCharge)
+
+  /// Return the charge
+  inline double HEPMC_TO_PID_FN(charge)
+
+
+  /// @brief Is this particle the first in the 'decay' chain to match property F?
+  ///
+  /// i.e. classifier(const GenParticle* p) is true, and p has no parents which match F
+  template <typename F>
+  inline bool isFirstWith(const HepMC::GenParticle* p, const F& classifier) {
+    if (!classifier(p)) return false; // p doesn't have property F so it can't be the first particle with it
+    if (!p->production_vertex()) return true; // p has no parents, so it's the first
+    for (const HepMC::GenParticle* parent : const_parents(p->production_vertex())) {
+      if (classifier(parent)) return false; // if its parent has property F, p can't be the first
+    }
+    return true; // p has F and no parents do
+  }
+
+  /// @brief Is this particle the last in the 'decay' chain to match property F?
+  ///
+  /// i.e. classifier(const GenParticle* p) is true, and p has no children which match F
+  template <typename F>
+  inline bool isLastWith(const HepMC::GenParticle* p, const F& classifier) {
+    if (!classifier(p)) return false; // p doesn't have property F so it can't be the last particle with it
+    if (!p->end_vertex()) return true; // p has no children, so it's the last
+    for (const HepMC::GenParticle* child : const_children(p->end_vertex())) {
+      if (classifier(child)) return false; // if its child has property F, p can't be the first
+    }
+    return true; // p has F and no children do
   }
 
 
@@ -230,9 +293,10 @@ namespace MCUtils {
   ///
   /// i.e. it has no parents with the same PID
   inline bool isFirstReplica(const HepMC::GenParticle* p) {
+    /// @todo Rewrite with isFirstWith and a lambda based on matching p->pdg_id
     if (!p->production_vertex()) return true;
     bool isfirst = true;
-    foreach (const HepMC::GenParticle* m, const_parents(p->production_vertex())) {
+    for (const HepMC::GenParticle* m : const_parents(p->production_vertex())) {
       if (m->pdg_id() == p->pdg_id()) {
         isfirst = false;
         break;
@@ -245,9 +309,10 @@ namespace MCUtils {
   ///
   /// i.e. it has no daughters with the same PID
   inline bool isLastReplica(const HepMC::GenParticle* p) {
+    /// @todo Rewrite with isLastWith and a lambda based on matching p->pdg_id
     if (!p->end_vertex()) return true;
     bool islast = true;
-    foreach (const HepMC::GenParticle* d, const_children(p->end_vertex())) {
+    for (const HepMC::GenParticle* d : const_children(p->end_vertex())) {
       if (d->pdg_id() == p->pdg_id()) {
         islast = false;
         break;
@@ -257,7 +322,6 @@ namespace MCUtils {
   }
 
 
-  /// @todo Add isPrompt (with what definition?)
 
 
   /// A function object with state of the status code to be tested for
@@ -321,7 +385,7 @@ namespace MCUtils {
 
 
   inline bool inEtaRange(const HepMC::GenParticle* p, double etamin, double etamax) {
-    return inRange(eta(p->momentum()), etamin, etamax);
+    return HEPUtils::in_range(eta(p->momentum()), etamin, etamax);
   }
   struct InEtaRange {
     InEtaRange(double etamin, double etamax) : etamin(etamin), etamax(etamax) { }
@@ -340,7 +404,7 @@ namespace MCUtils {
 
 
   inline bool inRapRange(const HepMC::GenParticle* p, double ymin, double ymax) {
-    return inRange(rap(p->momentum()), ymin, ymax);
+    return HEPUtils::in_range(rap(p->momentum()), ymin, ymax);
   }
   struct InRapRange {
     InRapRange(double ymin, double ymax) : ymin(ymin), ymax(ymax) { }
@@ -377,7 +441,7 @@ namespace MCUtils {
   /// @brief Determine whether the particle is outside the physical status code range
   ///
   /// If the answer is "true", use with extreme, generator-specific care!
-  inline bool hasNonStandardStatus(const HepMC::GenParticle* p) { return !inRange(p->status(), 1, 5); }
+  inline bool hasNonStandardStatus(const HepMC::GenParticle* p) { return !in_range(p->status(), 1, 5); }
 
   /// Is this a physically reliable final state particle? (as opposed to a debugging entry)
   inline bool isPhysical(const HepMC::GenParticle* p) {
@@ -448,6 +512,7 @@ namespace MCUtils {
   }
   /// @brief Determine whether the given particle is from a hadron or tau decay
   ///
+  /// @todo Use a better, more explicit name?
   /// Specifically, walk up the ancestor chain until a status 2 hadron or tau is found, if at all.
   inline bool fromDecay(const HepMC::GenParticle* p) {
     return fromAncestorWith(p, _isDecayedHadronOrTau);
@@ -461,57 +526,89 @@ namespace MCUtils {
     return fromAncestorWith(p, isDecayedHadron);
   }
 
+  /// @brief Determine whether the given particle is from a heavy hadron decay
+  ///
+  /// Specifically, walk up the ancestor chain until a status 2 heavy hadron is found, if at all.
+  inline bool fromHeavyHadronDecay(const HepMC::GenParticle* p) {
+    return fromAncestorWith(p, isHeavyHadron);
+  }
+
+  /// @brief Determine whether the given particle is from a bottom hadron decay
+  ///
+  /// Specifically, walk up the ancestor chain until a status 2 bottom hadron is found, if at all.
+  inline bool fromBottomHadronDecay(const HepMC::GenParticle* p) {
+    return fromAncestorWith(p, isBottomHadron);
+  }
+
+  /// @brief Determine whether the given particle is from a charm hadron decay
+  ///
+  /// Specifically, walk up the ancestor chain until a status 2 charm hadron is found, if at all.
+  inline bool fromCharmHadronDecay(const HepMC::GenParticle* p) {
+    return fromAncestorWith(p, isCharmHadron);
+  }
+
   /// @brief Determine whether the given particle is from a tau decay
   ///
-  /// Specifically, walk up the ancestor chain until a status 2 tau is found, if at all.
-  inline bool fromTauDecay(const HepMC::GenParticle* p) {
+  /// Specifically, walk up the ancestor chain until a tau is found, if at all.
+  /// If @a only_prompt_taus is true then return false if the tau itself was from a hadron decay.
+  inline bool fromTauDecay(const HepMC::GenParticle* p, bool only_prompt_taus=false) {
+    // If the tau was non-prompt, there will also be a hadron in the history:
+    if (only_prompt_taus && fromHadronDecay(p)) return false;
+    // Else...
     return fromAncestorWith(p, isDecayedTau);
+  }
+
+  /// @brief Determine whether the given particle is from a prompt tau decay
+  ///
+  /// @note Syntactic sugar for fromTauDecay(p, true)
+  inline bool fromPromptTauDecay(const HepMC::GenParticle* p) {
+    return fromTauDecay(p, true);
   }
 
   /// @brief Determine whether the given particle is from a hadronic tau decay
   ///
   /// Specifically, walk up the ancestor chain until a status 2 tau is found, if at all.
-  inline bool fromHadronicTauDecay(const HepMC::GenParticle* p) {
+  /// If @a only_prompt_taus is true then return false if the tau itself was from a hadron decay.
+  inline bool fromHadronicTauDecay(const HepMC::GenParticle* p, bool only_prompt_taus=false) {
+    // If the tau was non-prompt, there will also be a hadron in the history:
+    if (only_prompt_taus && fromHadronDecay(p)) return false;
+    // Else...
     return fromAncestorWith(p, isHadronicTau);
   }
 
-
-  /// Helper function used in detecting HF hadron/tau decay daughters
-  /// @todo Use a C++11 inline lambda when available
-  inline bool _isDecayedHFHadronOrTau(const HepMC::GenParticle* p) {
-    // if (isDecayed(p) && (abs(p->pdg_id()) == PID::TAU || isHeavyHadron(p)))
-    //   std::cout << "HFTau: " << p->barcode() << ", " << p->pdg_id() << p->status() << std::endl;
-    return isDecayed(p) && (isTau(p) || isHeavyHadron(p));
+  /// @brief Determine whether the given particle is from a prompt tau decay
+  ///
+  /// @note Syntactic sugar for fromHadronicTauDecay(p, true)
+  inline bool fromPromptHadronicTauDecay(const HepMC::GenParticle* p) {
+    return fromHadronicTauDecay(p, true);
   }
+
+
   /// @brief Determine whether the given particle is from a HF hadron or tau decay
   ///
   /// Specifically, walk up the ancestor chain until a status 2 c/b hadron or tau is found, if at all.
-  inline bool fromTauOrHFDecay(const HepMC::GenParticle* p) {
-    return fromAncestorWith(p, _isDecayedHFHadronOrTau);
+  /// If @a only_prompt_taus is true then return false if the tau itself was from a hadron decay.
+  inline bool fromTauOrHFDecay(const HepMC::GenParticle* p, bool only_prompt_taus=false) {
+    return fromHeavyHadronDecay(p) || fromTauDecay(p, only_prompt_taus); //< Evaluation order & short-circuiting are important!!
   }
 
 
-  /// @todo Add more explanatory variants for e.g. isBremPhoton... this one's not obviously of general usefulness
-  ///
-  // inline bool isBremsstrahlung(const HepMC::GenParticle* p) {
-  //   if (abs(p->pdg_id()) != ELECTRON) return false;
-  //   if (!p->end_vertex()) return false;
-  //   if (p->end_vertex()->particles_out_size() != 2) return isNotBrem;
-  //   // Ensure that the children are a corresponding e+/e- and a photon
-  //   int mult = 1;
-  //   /// @todo Ripe for clean-up with new accessor functions!
-  //   HepMC::GenVertex::particle_iterator child = p->end_vertex()->particles_begin(HepMC::children);
-  //   HepMC::GenVertex::particle_iterator childE = p->end_vertex()->particles_end(HepMC::children);
-  //   for (; child != childE; ++child) {
-  //     /// @todo Make sure that the electron/positron child matches p
-  //     if (abs((*child)->pdg_id()) != 11 && (*child)->pdg_id() != PHOTON) return false;
-  //     mult *= (*child)->pdg_id();
-  //   }
-  //   if (abs(mult) != 11*22) return false;
-  //   return true;
-  // }
 
-  /// @todo Also an isConversion()/isConverted() type of function? Should be used on the photon or electrons?
+  /// Return if the give particle is prompt, defined as a physical particle emitted directly from the hard process
+  ///
+  /// The full and specific definition used is that the particle must be
+  /// physical (status 1 or 2), a photon or lepton (hadrons are never considered
+  /// prompt in this definition), and must not come from the decay of a hadron
+  /// or non-prompt tau. By default leptons and photons emitted from a prompt
+  /// tau are themselves considered prompt; changing the optional boolean
+  /// parameter to false will result in such particles being reported as
+  /// non-prompt (i.e. isPrompt = false).
+  inline bool isPrompt(const HepMC::GenParticle* p, bool accept_prompt_tau_decay_leptons=true) {
+    if (!isPhysical(p) || isHadron(p)) return false;
+    if (fromHadronDecay(p)) return false;
+    if (!accept_prompt_tau_decay_leptons && fromTauDecay(p, true)) return false;
+    return true;
+  }
 
   //@}
 

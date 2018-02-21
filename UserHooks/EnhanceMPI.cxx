@@ -1,6 +1,5 @@
 #include "UserHookUtils.hh"
 #include "Sacrifice/UserHooksFactory.hh"
-#include "boost/lexical_cast.hpp"
 #include <stdexcept>
 #include <iostream>
 

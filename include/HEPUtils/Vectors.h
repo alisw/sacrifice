@@ -1,15 +1,24 @@
+// -*- C++ -*-
+//
+// This file is part of HEPUtils -- https://bitbucket.org/andybuckley/heputils
+// Copyright (C) 2013-2016 Andy Buckley <andy.buckley@cern.ch>
+//
+// Embedding of HEPUtils code in other projects is permitted provided this
+// notice is retained and the HEPUtils namespace and include path are changed.
+//
 #pragma once
 
-#include "MCUtils/MathUtils.h"
-#include "MCUtils/Utils.h"
+#include "HEPUtils/MathUtils.h"
+#include "HEPUtils/Utils.h"
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 #include <cmath>
 
 /// @file Physics vectors stuff
 /// @author Andy Buckley <andy.buckley@cern.ch>
 
-namespace MCUtils {
+namespace HEPUtils {
 
 
   /// @brief A robust 4-momentum class for on-shell vectors.
@@ -149,14 +158,16 @@ namespace MCUtils {
 
     /// Set the mass
     P4& setM(double mass) {
-      assert(mass >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
       _m = mass;
       return *this;
     }
 
     /// Set the p coordinates and mass simultaneously
     P4& setPM(double px, double py, double pz, double mass) {
-      assert(mass >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
       setPx(px); setPy(py); setPz(pz);
       setM(mass);
       return *this;
@@ -167,8 +178,10 @@ namespace MCUtils {
     }
 
     /// Set the p coordinates and energy simultaneously
+    /// @warning For numerical stability, prefer setPM when possible
     P4& setPE(double px, double py, double pz, double E) {
-      assert(E >= 0);
+      if (E < 0)
+        throw std::invalid_argument("Negative energy given as argument");
       setPx(px); setPy(py); setPz(pz);
       const double mass = sqrt( sqr(E) - sqr(p()) );
       setM(mass);
@@ -184,10 +197,13 @@ namespace MCUtils {
     /// eta = -ln(tan(theta/2))
     /// -> theta = 2 atan(exp(-eta))
     P4& setEtaPhiME(double eta, double phi, double mass, double E) {
-      assert(mass >= 0);
-      assert(E >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (E < 0)
+        throw std::invalid_argument("Negative energy given as argument");
       const double theta = 2 * atan(exp(-eta));
-      assert(theta >= 0 && theta <= M_PI);
+      if (theta < 0 || theta > M_PI)
+        throw std::domain_error("Polar angle outside 0..pi in calculation");
       setThetaPhiME(theta, phi, mass, E);
       return *this;
     }
@@ -197,10 +213,13 @@ namespace MCUtils {
     /// eta = -ln(tan(theta/2))
     /// -> theta = 2 atan(exp(-eta))
     P4& setEtaPhiMPt(double eta, double phi, double mass, double pt) {
-      assert(mass >= 0);
-      assert(pt >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (pt < 0)
+        throw std::invalid_argument("Negative transverse momentum given as argument");
       const double theta = 2 * atan(exp(-eta));
-      assert(theta >= 0 && theta <= M_PI);
+      if (theta < 0 || theta > M_PI)
+        throw std::domain_error("Polar angle outside 0..pi in calculation");
       const double p = pt / sin(theta);
       const double E = sqrt( sqr(p) + sqr(mass) );
       setThetaPhiME(theta, phi, mass, E);
@@ -216,15 +235,18 @@ namespace MCUtils {
     /// -> pz = sqrt(pt^2 + m^2) sinh(y)
     /// -> sqrt(pt^2 + m^2) = E / cosh(y)
     P4& setRapPhiME(double y, double phi, double mass, double E) {
-      assert(mass >= 0);
-      assert(E >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (E < 0)
+        throw std::invalid_argument("Negative energy given as argument");
       const double sqrt_pt2_m2 = E / cosh(y);
       const double pt = sqrt( sqr(sqrt_pt2_m2) - sqr(mass) );
-      assert(pt >= 0);
+      if (pt < 0)
+        throw std::domain_error("Negative transverse momentum in calculation");
       const double pz = sqrt_pt2_m2 * sinh(y);
       const double px = pt * cos(phi);
       const double py = pt * sin(phi);
-      setPE(px, py, pz, E);
+      setPM(px, py, pz, mass);
       return *this;
     }
 
@@ -233,10 +255,13 @@ namespace MCUtils {
     /// y = 0.5 * ln((E+pz)/(E-pz))
     /// -> E = sqrt(pt^2 + m^2) cosh(y)  [see above]
     P4& setRapPhiMPt(double y, double phi, double mass, double pt) {
-      assert(mass >= 0);
-      assert(pt >= 0);
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (pt < 0)
+        throw std::invalid_argument("Negative transverse mass given as argument");
       const double E = sqrt( sqr(pt) + sqr(mass) ) * cosh(y);
-      assert(E >= 0);
+      if (E < 0)
+        throw std::domain_error("Negative energy in calculation");
       setRapPhiME(y, phi, mass, E);
       return *this;
     }
@@ -247,16 +272,20 @@ namespace MCUtils {
     /// pz = p cos(theta)
     /// pt = p sin(theta)
     P4& setThetaPhiME(double theta, double phi, double mass, double E) {
-      assert(theta >= 0 && theta <= M_PI);
-      assert(mass >= 0);
-      assert(E >= 0);
+      if (theta < 0 || theta > M_PI)
+        throw std::invalid_argument("Polar angle outside 0..pi given as argument");
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (E < 0)
+        throw std::invalid_argument("Negative energy given as argument");
       const double p = sqrt( sqr(E) - sqr(mass) );
       const double pz = p * cos(theta);
       const double pt = p * sin(theta);
-      assert(pt >= 0);
+      if (pt < 0)
+        throw std::invalid_argument("Negative transverse momentum in calculation");
       const double px = pt * cos(phi);
       const double py = pt * sin(phi);
-      setPE(px, py, pz, E);
+      setPM(px, py, pz, mass);
       return *this;
     }
 
@@ -266,15 +295,18 @@ namespace MCUtils {
     /// pz = p cos(theta)
     /// E = sqrt(p^2 + mass^2)
     P4& setThetaPhiMPt(double theta, double phi, double mass, double pt) {
-      assert(theta >= 0 && theta <= 2*M_PI);
-      assert(pt >= 0);
-      assert(mass >= 0);
+      if (theta < 0 || theta > M_PI)
+        throw std::invalid_argument("Polar angle outside 0..pi given as argument");
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (pt < 0)
+        throw std::invalid_argument("Negative transverse momentum given as argument");
       const double p = pt / sin(theta);
       const double px = pt * cos(phi);
       const double py = pt * sin(phi);
       const double pz = p * cos(theta);
-      const double E = sqrt( sqr(p) + sqr(mass) );
-      setPE(px, py, pz, E);
+      //const double E = sqrt( sqr(p) + sqr(mass) );
+      setPM(px, py, pz, mass);
       return *this;
     }
 
@@ -282,13 +314,16 @@ namespace MCUtils {
     ///
     /// pz = sqrt(E^2 - mass^2 - pt^2)
     P4& setPtPhiME(double pt, double phi, double mass, double E) {
-      assert(pt >= 0);
-      assert(mass >= 0);
-      assert(E >= 0);
+      if (pt < 0)
+        throw std::invalid_argument("Negative transverse momentum given as argument");
+      if (mass < 0)
+        throw std::invalid_argument("Negative mass given as argument");
+      if (E < 0)
+        throw std::invalid_argument("Negative energy given as argument");
       const double px = pt * cos(phi);
       const double py = pt * sin(phi);
       const double pz = sqrt(sqr(E) - sqr(mass) - sqr(pt));
-      setPE(px, py, pz, E);
+      setPM(px, py, pz, mass);
       return *this;
     }
 
@@ -338,8 +373,12 @@ namespace MCUtils {
     double theta() const { if (p2() == 0) return 0; else if (pz() == 0) return M_PI; else return atan2(rho(),pz()); }
     /// Get the spatial vector pseudorapidity
     double eta() const { return -log(tan( 0.5 * theta() )); } //< Optimise with a trig reln on tan(x/2) to avoid tan(atan(..)/2)?
+    /// Get the spatial vector absolute pseudorapidity
+    double abseta() const { return fabs(eta()); }
     /// Get the 4-momentum rapidity
     double rap() const { return 0.5 * (E() + pz()) / (E() - pz()); }
+    /// Get the 4-momentum absolute rapidity
+    double absrap() const { return fabs(rap()); }
 
     //@}
 
@@ -347,10 +386,12 @@ namespace MCUtils {
     /// @name Calculations w.r.t. other P4 vectors
     //@{
 
+    /// Spatial dot product
+    double dot3(const P4& v) const { return px()*v.px() + py()*v.py() + pz()*v.pz(); }
     /// Lorentz dot product with the positive metric term on E
-    double dot(const P4& v) const { return E()*v.E() - px()*v.px() - py()*v.py() - pz()*v.pz(); }
+    double dot(const P4& v) const { return E()*v.E() - dot3(v); }
     /// Spatial angle to another P4 vector
-    double angleTo(const P4& v) const { return acos(px()*v.px() + py()*v.py() + pz()*v.pz()) / ( p()*v.p() ); }
+    double angleTo(const P4& v) const { return acos( dot3(v) /p()/v.p() ); }
     /// Difference in phi between two vectors
     double deltaPhi(const P4& v) const { return deltaphi(phi(), v.phi()); }
     /// Difference in pseudorapidity between two vectors
@@ -461,58 +502,6 @@ namespace MCUtils {
   inline P4 operator * (const P4& a, double f) { P4 rtn = a; return rtn *= f; }
   inline P4 operator * (double f, const P4& a) { P4 rtn = a; return rtn *= f; }
   inline P4 operator / (const P4& a, double f) { P4 rtn = a; return rtn /= f; }
-  //@}
-
-
-
-  /// @name Converters between HepMC and P4 momentum types
-  //@{
-
-  /// Convert a HepMC FourVector to a P4
-  inline P4 mk_p4(const HepMC::FourVector& p) {
-    return P4(p.px(), p.py(), p.pz(), p.e());
-  }
-
-  /// Convert a HepMC GenParticle to a FastJet PseudoJet
-  inline P4 mk_p4(const HepMC::GenParticle* gp) {
-    return mk_p4(gp->momentum());
-  }
-
-  /// Convert a vector of HepMC GenParticles to a vector of FastJet PseudoJets
-  inline std::vector<P4> mk_p4s(const std::vector<const HepMC::GenParticle*>& gps) {
-    std::vector<P4> p4s;
-    foreach (const HepMC::GenParticle* gp, gps) {
-      p4s.push_back( mk_p4(gp) );
-    }
-    return p4s;
-  }
-
-  //@}
-
-
-  /// @name HepMC vector utils
-  //@{
-
-  /// Compute 3-vector magnitude-squared from a HepMC FourVector
-  inline double mag2(const HepMC::FourVector& v) {
-    return mk_p4(v).p2();
-  }
-
-  /// Compute 3-vector magnitude from a HepMC FourVector
-  inline double mag(const HepMC::FourVector& v) {
-    return mk_p4(v).p();
-  }
-
-  /// Compute pseudorapidity from a HepMC FourVector
-  inline double eta(const HepMC::FourVector& v) {
-    return mk_p4(v).eta();
-  }
-
-  /// Compute rapidity from a HepMC FourVector
-  inline double rap(const HepMC::FourVector& v) {
-    return mk_p4(v).rap();
-  }
-
   //@}
 
 

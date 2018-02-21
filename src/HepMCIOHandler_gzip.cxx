@@ -1,7 +1,6 @@
 #include "Sacrifice/HepMCIOHandler.hh"
 
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
+#include "zstr/zstr.hpp"
 
 namespace Sacrifice{
  
@@ -20,15 +19,7 @@ namespace Sacrifice{
       
       string name = m_outputArg.getValue() + ".gz";
       
-      boost::iostreams::filtering_ostream *filter_ostr = 
-      new boost::iostreams::filtering_ostream();
-      
-      filter_ostr->push(boost::iostreams::gzip_compressor());
-      m_zippedStream.reset(new std::ofstream(name.c_str(), std::ios::out));//|std::ios::binary));
-      
-      filter_ostr->push(*m_zippedStream);
-      
-      m_ostr.reset((ostream*)filter_ostr);
+      m_ostr.reset(new zstr::ofstream(name));
       
       m_io.reset(new HepMC::IO_GenEvent(*m_ostr));
       

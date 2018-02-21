@@ -1,21 +1,19 @@
 #ifndef SACRIFICE_HEPMCIO_HANDLER_HH
 #define SACRIFICE_HEPMCIO_HANDLER_HH
 
-#include <string>
-
-#include <fstream>
-
-#include "boost/smart_ptr.hpp"
-
 #include "tclap/CmdLine.h"
 
 #include "HepMC/IO_GenEvent.h"
+
+#include <string>
+#include <fstream>
+#include <memory>
 
 namespace Sacrifice{
  
   using std::string;
   using std::ostream;
-  using boost::shared_ptr;
+  using std::unique_ptr;
   
   using TCLAP::SwitchArg;
   using TCLAP::ValueArg;
@@ -27,9 +25,9 @@ namespace Sacrifice{
     HepMCIOHandler(TCLAP::CmdLine &cmd);
     
     ~HepMCIOHandler(){
-      m_io.reset();
-      m_ostr.reset();
-      m_zippedStream.reset();
+      //m_io.reset();
+      //m_ostr.reset();
+      //m_zippedStream.reset();
 
     }
     
@@ -48,11 +46,11 @@ namespace Sacrifice{
     
     bool m_doInitialise;
     
-    shared_ptr<ostream> m_ostr;
+    unique_ptr<ostream> m_ostr;
     
-    shared_ptr<ostream> m_zippedStream;
+    unique_ptr<ostream> m_zippedStream;
     
-    shared_ptr<HepMC::IO_GenEvent> m_io;
+    unique_ptr<HepMC::IO_GenEvent> m_io;
     
     // Switch to turn on gzip compression
     SwitchArg m_zipArg;

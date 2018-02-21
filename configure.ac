@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 
-AC_INIT( [Sacrifice], [1.0.0], [jmonk@cern.ch], [Sacrifice])
+AC_INIT( [Sacrifice], [1.1.1], [jmonk@cern.ch], [Sacrifice])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/PythiaMain.cxx])
 AC_CONFIG_HEADERS([config/config.h])
@@ -10,6 +10,7 @@ AC_SUBST(LT_OBJDIR)
 AC_LANG(C++)
 
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
@@ -20,9 +21,6 @@ AM_PROG_CC_C_O
 ##These are for tclap
 AC_CXX_HAVE_SSTREAM
 AC_CXX_HAVE_STRSTREAM
-
-## This macro checks for boost in autoconf 2.59
-AX_BOOST_BASE([1.33.0], [AC_MSG_NOTICE([Found Boost])], [AC_MSG_ERROR([Boost library cannot be found!])])
 
 # lib suffix differs on OS X
 AC_DEFINE_DYNAMIC_LIBS
@@ -41,7 +39,7 @@ AS_IF([test x$auto_lcg == xno],
 
 AC_SEARCH_LCG
 
-AC_GET_MCUTILS([AC_MSG_NOTICE([MCUtils headers present in include/MCUtils])],[AC_MSG_ERROR([Unable to download MCUtils headers])])
+AC_GET_MCUTILS([AC_MSG_NOTICE([MCUtils headers present in include/MCUtils])],[AC_MSG_ERROR([Unable to download MCUtils or HEPUtils headers])])
 
 AC_ARG_WITH([MCUtils],
   [AC_HELP_STRING([--with-MCUtils], [enable MCUtils for HepMC filtering and (optionally) give the installation location (default disabled)])],
@@ -133,11 +131,22 @@ AC_ARG_WITH([pythia],
 AC_SEARCH_PYTHIA([AC_MSG_NOTICE([Found Pythia 8 library and headers])],
                   [AC_MSG_ERROR([Could not find Pythia 8 library and headers!!])])
 
+AX_CHECK_ZLIB([have_zlib=yes],[have_zlib=no])
+
 AC_MSG_NOTICE([have zlib = $have_zlib ])
 AM_CONDITIONAL(ENABLE_GZIP, [test x$have_zlib = xyes] )
 
 AM_CXXFLAGS="$AM_CXXFLAGS -Wall -O2"
-AM_CPPFLAGS="$AM_CPPFLAGS -Wall -O2 -I\$(top_builddir)/ -I\$(top_builddir)/include $BOOST_CPPFLAGS"
+AM_CPPFLAGS="$AM_CPPFLAGS -Wall -O2 -I\$(top_builddir)/ -I\$(top_builddir)/include"
+
+if test x$have_zlib = xyes ; then
+  AM_LDFLAGS="$AM_LDFLAGS -L${ZLIB_HOME}/lib -lz"
+  AM_CPPFLAGS="$AM_CPPFLAGS -I${ZLIB_HOME}/include"
+  AM_CXXFLAGS="$AM_CPPFLAGS -I${ZLIB_HOME}/include"
+  AC_SUBST(AM_LDFLAGS)
+fi
+
+
 AC_SUBST(AM_CXXFLAGS)
 AC_SUBST(AM_CPPFLAGS)
 
@@ -146,6 +155,7 @@ AC_CONFIG_FILES([ Makefile
                   include/Makefile
                   include/Sacrifice/Makefile
                   include/MCUtils/Makefile
+                  include/HEPUtils/Makefile
                   include/tclap/Makefile
                   share/Makefile
                   share/setupPythia.sh

@@ -4,13 +4,15 @@
 
 #include "HepMC/IO_GenEvent.h"
 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include <fstream>
+#include <regex>
+#include <stdexcept>
 
 namespace Sacrifice{
+  
+  using std::regex;
+  using std::regex_search;
+  using std::regex_match;
   
   inline bool _isPID0(const HepMC::GenParticle* p) {
     return p->pdg_id() == 0;
@@ -43,7 +45,7 @@ namespace Sacrifice{
       
       if(statuses->second.size() == 0) return false;
       
-      foreach(int status, statuses->second){
+      for(int status: statuses->second){
         if(status == p->status()) return false;
       }
     }
@@ -51,7 +53,7 @@ namespace Sacrifice{
     statuses = m_pids.find(0);
     if(statuses == m_pids.end() || statuses->second.size() == 0) return true;
     
-    foreach(int status, statuses->second){
+    for(int status: statuses->second){
       if(status == p->status()) return false;
     }
     
@@ -64,10 +66,9 @@ namespace Sacrifice{
   m_doInitialise(true),
   m_slimArg("s", "slim-HepMC", "slim the HepMC record to remove gen-specific and non-interesting particles (default=false)", false),
   m_keepList("k", "keep-particles", "give a txt file specifying list of pdgids and statuses to keep.  All other particles removed", false, "", "string"){
-    
+
     cmd.add(m_slimArg);
     cmd.add(m_keepList);
-    
   }
   
   bool MCUtilsHandler::isAvailable(){return true;}
@@ -84,6 +85,11 @@ namespace Sacrifice{
       m_classifiers.push_back(_isLoop);
     }
     
+    regex removeComment("[^\\[c!#\\]]*");
+    regex matchCommand(" *[+-]?\\d* *: *([+-]?\\d+ *)+");
+    regex findPID(" *[+-]?(\\d+)? *:");
+    regex findInt("[+-]?\\d+[^ :]");
+    
     if(m_keepList.getValue() != ""){
       std::ifstream file(m_keepList.getValue().c_str());
       
@@ -92,33 +98,30 @@ namespace Sacrifice{
           string line;
           getline(file, line);
           
-          vector<string> comments;
-          boost::split(comments, line, boost::is_any_of("#!c"));
+          std::smatch result;
           
-          if(comments.size() == 0) continue;
+          // Search for string up to comment command [c!#]
+          regex_search(line, result, removeComment);
           
-          vector<string> ids;
-          boost::split(ids, comments[0], boost::is_any_of(":"));
-        
-          if(ids.size()==0) continue;
+          string command = result.str();
           
-          boost::erase_all(ids[0], " ");
+          if(command == "") continue;
           
-          int pid = (ids[0] == "")? 0: boost::lexical_cast<int>(ids[0]);
-                    
+          // Check command matches form ID:status
+          if(!regex_match(command, matchCommand)){
+            throw std::runtime_error("Particle filtering command is not understood: " + command);
+          }
+          
+          regex_search(command, result, findPID);
+          command = result.suffix().str();
+          regex_search(result.str(), result, findInt);
+          int pid = (result.str() == "")? 0: std::stoi(result.str());
+          
           vector<int> statuses;
           
-          if(ids.size() != 1){
-            
-            vector<string> statusStrings;
-            
-            boost::split(statusStrings, ids[1], boost::is_any_of(" ")); 
-            
-            foreach(string status, statusStrings){
-              if(status != ""){
-                statuses.push_back(boost::lexical_cast<int>(status));
-              }
-            }
+          while(regex_search(command, result, findInt)){
+            statuses.push_back(std::stoi(result.str()));
+            command = result.suffix().str();
           }
           
           m_selector.addParticle(abs(pid), statuses);
