@@ -114,7 +114,8 @@ namespace Sacrifice{
           
           regex_search(command, result, findPID);
           command = result.suffix().str();
-          regex_search(result.str(), result, findInt);
+	  std::string result_str = result.str();
+          regex_search(result_str, result, findInt);
           int pid = (result.str() == "")? 0: std::stoi(result.str());
           
           vector<int> statuses;
