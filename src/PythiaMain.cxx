@@ -131,8 +131,8 @@ int main(int argc, char **argv){
   }
 
   if(hooksArg.getValue() != ""){
-    Sacrifice::UserHooksFactory::loadLibrary(libArg.getValue());
-    if(!pythia.setUserHooksPtr(Sacrifice::UserHooksFactory::create(hooksArg.getValue())))
+//    Sacrifice::UserHooksFactory::loadLibrary(libArg.getValue());
+//    if(!pythia.setUserHooksPtr(Sacrifice::UserHooksFactory::create(hooksArg.getValue())))
       throw std::runtime_error("Unable to use UserHook: " + hooksArg.getValue());
   }
 
