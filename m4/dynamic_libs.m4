@@ -11,7 +11,7 @@ AC_DEFUN([AC_DEFINE_DYNAMIC_LIBS],[
     PROD_NAME=$($SWVERS -productName | cut -f 2 -d:)
   fi
 
-  if test "$PROD_NAME" = "Mac OS X"; then
+  if test "$PROD_NAME" = "Mac OS X" || test "$PROD_NAME" = "macOS"; then
     LIB_SUFFIX="dylib"
     LIBPATHVARNAME="DYLD_LIBRARY_PATH"
   fi

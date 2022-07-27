@@ -769,7 +769,7 @@ br_dirname (const char *path)
 	if (path == (const char *) NULL)
 		return (char *) NULL;
 
-	end = strrchr (path, '/');
+	end = (char *) strrchr (path, '/');
 	if (end == (const char *) NULL)
 		return strdup (".");
 

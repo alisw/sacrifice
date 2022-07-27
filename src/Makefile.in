@@ -130,7 +130,7 @@ am__run_pythia_SOURCES_DIST = BeamParticle.cxx UserHooksFactory.cxx \
 	PythiaMain.cxx MCUtilsHandler_enabled.cxx \
 	MCUtilsHandler_disabled.cxx PhotosHandler_enabled.cxx \
 	PhotosHandler_disabled.cxx HepMCIOHandler_gzip.cxx \
-	HepMCIOHandler_no_gzip.cxx binreloc.c
+	HepMCIOHandler_no_gzip.cxx binreloc.cxx
 @ENABLE_MCUTILS_TRUE@am__objects_1 = run_pythia-MCUtilsHandler_enabled.$(OBJEXT)
 @ENABLE_MCUTILS_FALSE@am__objects_2 = run_pythia-MCUtilsHandler_disabled.$(OBJEXT)
 @ENABLE_PHOTOS_TRUE@am__objects_3 = run_pythia-PhotosHandler_enabled.$(OBJEXT)
@@ -424,7 +424,7 @@ top_srcdir = @top_srcdir@
 SUBDIRS = .
 run_pythia_SOURCES = BeamParticle.cxx UserHooksFactory.cxx \
 	PythiaMain.cxx $(am__append_4) $(am__append_5) $(am__append_8) \
-	$(am__append_11) $(am__append_12) $(am__append_13) binreloc.c
+	$(am__append_11) $(am__append_12) $(am__append_13) binreloc.cxx
 run_pythia_CPPFLAGS = $(AM_CPPFLAGS) $(PYTHIA_CPPFLAGS) \
 	-DENABLE__BINRELOC -DDEFAULTDATADIR=\"$(PYTHIA_DATA)\" \
 	-DDEFAULTPARAMDIR=\"$(datadir)/Sacrifice\" \
@@ -559,19 +559,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-run_pythia-binreloc.o: binreloc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT run_pythia-binreloc.o -MD -MP -MF $(DEPDIR)/run_pythia-binreloc.Tpo -c -o run_pythia-binreloc.o `test -f 'binreloc.c' || echo '$(srcdir)/'`binreloc.c
+run_pythia-binreloc.o: binreloc.cxx
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT run_pythia-binreloc.o -MD -MP -MF $(DEPDIR)/run_pythia-binreloc.Tpo -c -o run_pythia-binreloc.o `test -f 'binreloc.cxx' || echo '$(srcdir)/'`binreloc.cxx
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/run_pythia-binreloc.Tpo $(DEPDIR)/run_pythia-binreloc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='binreloc.c' object='run_pythia-binreloc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='binreloc.cxx' object='run_pythia-binreloc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o run_pythia-binreloc.o `test -f 'binreloc.c' || echo '$(srcdir)/'`binreloc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o run_pythia-binreloc.o `test -f 'binreloc.cxx' || echo '$(srcdir)/'`binreloc.cxx
 
-run_pythia-binreloc.obj: binreloc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT run_pythia-binreloc.obj -MD -MP -MF $(DEPDIR)/run_pythia-binreloc.Tpo -c -o run_pythia-binreloc.obj `if test -f 'binreloc.c'; then $(CYGPATH_W) 'binreloc.c'; else $(CYGPATH_W) '$(srcdir)/binreloc.c'; fi`
+run_pythia-binreloc.obj: binreloc.cxx
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT run_pythia-binreloc.obj -MD -MP -MF $(DEPDIR)/run_pythia-binreloc.Tpo -c -o run_pythia-binreloc.obj `if test -f 'binreloc.cxx'; then $(CYGPATH_W) 'binreloc.cxx'; else $(CYGPATH_W) '$(srcdir)/binreloc.cxx'; fi`
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/run_pythia-binreloc.Tpo $(DEPDIR)/run_pythia-binreloc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='binreloc.c' object='run_pythia-binreloc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='binreloc.cxx' object='run_pythia-binreloc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o run_pythia-binreloc.obj `if test -f 'binreloc.c'; then $(CYGPATH_W) 'binreloc.c'; else $(CYGPATH_W) '$(srcdir)/binreloc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(run_pythia_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o run_pythia-binreloc.obj `if test -f 'binreloc.cxx'; then $(CYGPATH_W) 'binreloc.cxx'; else $(CYGPATH_W) '$(srcdir)/binreloc.cxx'; fi`
 
 .cxx.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

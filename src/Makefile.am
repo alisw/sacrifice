@@ -43,6 +43,6 @@ else
 run_pythia_SOURCES  += HepMCIOHandler_no_gzip.cxx
 endif
 
-run_pythia_SOURCES  += binreloc.c
+run_pythia_SOURCES  += binreloc.cxx
 
 EXTRA_DIST = zstr
